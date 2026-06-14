@@ -69,7 +69,7 @@ void print_info(Elf32_Phdr *phdr, int arg)
     int prot = translate_prot_flag(phdr->p_flags);
     int map_flags = 18;
 
-    printf("0x%04x  0x%06x 0x%08x 0x%08x 0x%05x 0x%05x %d    0x%x   Prot:%d Map:%d \n",
+    printf("0x%04x  0x%06x 0x%08x 0x%08x 0x%05x   0x%05x    %d    0x%x    %d   %d \n",
            phdr->p_type,
            phdr->p_offset,
            phdr->p_vaddr,
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     }
     ////////////// here? were to print??
 
-    printf("Type     Offset   VirtAddr   PhysAddr   FileSiz   MemSiz   Flg   Align\n");
+    printf("Type     Offset   VirtAddr   PhysAddr   FileSiz   MemSiz   Flg   Align  Prot   Map \n");
     // Execute the iterator with the print callback
     foreach (map_start, print_info, fd)
         ;
