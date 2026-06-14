@@ -9,20 +9,44 @@
  * Print information about each program header.
  * The static counter 'i' tracks the header index across function calls.
  */
-void print_phdr(Elf32_Phdr *phdr, int arg)
+void print(Elf32_Phdr *phdr, int arg)
 {
     static int i = 0;
     printf("Program header number %d at address %p\n", i, (void *)phdr);
     i++;
 }
+int translate_prot_flag(int elf_flags)
+{
+    // transelating elf flag ==> mmap flag
+    int prot = 0;
 
+    // loking on the 4 flag= reading
+    if ((elf_flags & 4) != 0)
+    {
+        prot = prot + 1;
+    }
+
+    // reading
+    if ((elf_flags & 2) != 0)
+    {
+        prot = prot + 2;
+    }
+
+    // excute
+    if ((elf_flags & 1) != 0)
+    {
+        prot = prot + 4;
+    }
+
+    return prot;
+}
 /**
  * Iterates over all program headers in the ELF file.
  * map_start: The virtual memory address where the ELF file is mapped.
  * func: A callback function applied to each program header.
  * arg: Additional argument passed to the callback.
  */
-int foreach_phdr(void *map_start, void (*func)(Elf32_Phdr *, int), int arg)
+int foreach (void *map_start, void (*func)(Elf32_Phdr *, int), int arg)
 {
     // Cast the start to ELF Header to access meta-data
     Elf32_Ehdr *elf_head = (Elf32_Ehdr *)map_start;
@@ -38,6 +62,24 @@ int foreach_phdr(void *map_start, void (*func)(Elf32_Phdr *, int), int arg)
     }
 
     return 0;
+}
+
+void print_info(Elf32_Phdr *phdr, int arg)
+{ /// print the line with info
+    int prot = get_mmap_prot_flags(phdr->p_flags);
+    int map_flags = 18;
+
+    printf("0x%04x  0x%06x 0x%08x 0x%08x 0x%05x 0x%05x %d    0x%x   Prot:%d Map:%d \n",
+           phdr->p_type,
+           phdr->p_offset,
+           phdr->p_vaddr,
+           phdr->p_paddr,
+           phdr->p_filesz,
+           phdr->p_memsz,
+           phdr->p_flags,
+           phdr->p_align,
+           prot, // translation of the flags
+           map_flags);
 }
 
 int main(int argc, char **argv)
@@ -77,9 +119,12 @@ int main(int argc, char **argv)
         close(fd);
         return 1;
     }
+    ////////////// here? were to print??
 
+    printf("Type     Offset   VirtAddr   PhysAddr   FileSiz   MemSiz   Flg   Align\n");
     // Execute the iterator with the print callback
-    foreach_phdr(map_start, print_phdr, fd);
+    foreach (map_start, print_info, fd)
+        ;
 
     // Cleanup resources
     munmap(map_start, file_size);
