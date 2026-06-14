@@ -66,7 +66,7 @@ int foreach (void *map_start, void (*func)(Elf32_Phdr *, int), int arg)
 
 void print_info(Elf32_Phdr *phdr, int arg)
 { /// print the line with info
-    int prot = get_mmap_prot_flags(phdr->p_flags);
+    int prot = translate_prot_flag(phdr->p_flags);
     int map_flags = 18;
 
     printf("0x%04x  0x%06x 0x%08x 0x%08x 0x%05x 0x%05x %d    0x%x   Prot:%d Map:%d \n",
