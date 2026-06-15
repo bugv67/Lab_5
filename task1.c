@@ -64,7 +64,7 @@ int foreach (void *map_start, void (*func)(Elf32_Phdr *, int), int arg)
     return 0;
 }
 
-void print_info(Elf32_Phdr *phdr, int arg)
+void print_phdr_info(Elf32_Phdr *phdr, int arg)
 { /// print the line with info
     int prot = translate_prot_flag(phdr->p_flags);
     int map_flags = 18;
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 
     printf("Type     Offset   VirtAddr   PhysAddr   FileSiz   MemSiz   Flg   Align  Prot   Map \n");
     // Execute the iterator with the print callback
-    foreach (map_start, print_info, fd)
+    foreach (map_start, print_phdr_info, fd)
         ;
 
     // Cleanup resources
